@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/whole-day-schooling/background/index.html
 title: 背景
-fetched_at: 2026-09-16T10:39:07.802Z
+fetched_at: 2026-09-16T14:02:33.780Z
 ---
 
 改善香港教育質素是教育局一貫的工作目標。為加強基礎教育，本局於一九九三年開始逐步推行小學全日制。香港特別行政區政府首長在一九九八年的《施政報告》中，更明確申明推行小學全日制的目標。財政司司長在一九九九至二零零零年度的財政預算案，也強調在教育方面要多作投資，以實現行政長官提供高質素教育的承諾；增加全日制小學數目便是其中一個主要項目。

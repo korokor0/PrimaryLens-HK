@@ -9,6 +9,8 @@
 import { Hono } from 'hono';
 import { ConfigError, exampleTopics, parseConfig, type WatchedPage } from './lib/config.ts';
 import { createOpenAIModel, runChat } from './lib/agent/loop.ts';
+import { runCheck } from './lib/check.ts';
+import { PoliteFetcher } from './lib/fetch/polite.ts';
 import type { Store } from './lib/store/types.ts';
 
 export interface AppDeps {
@@ -77,6 +79,33 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return c.json({ error: message }, 502);
+    }
+  });
+
+  // 「檢查更新」 button. Runs exactly the same runCheck() as `pnpm check` — one lifecycle,
+  // two entrypoints (§6), so the UI can never drift from what cron does.
+  app.post('/api/check', async (c) => {
+    let cfg;
+    try {
+      cfg = parseConfig(env, 'monitor');
+    } catch (err) {
+      return c.json({ error: err instanceof ConfigError ? err.message : 'Monitoring is not configured.' }, 503);
+    }
+
+    const fetcher = new PoliteFetcher({ userAgent: cfg.botUserAgent, delayMs: cfg.fetchDelayMs });
+    try {
+      const robots = await fetcher.loadRobots(new URL(cfg.seedUrl).origin);
+      const result = await runCheck({ store, fetcher, pages, robots, webhookUrl: cfg.webhookUrl });
+      return c.json({
+        status: result.status,
+        changedPages: result.changedPages,
+        notified: result.notified,
+        pages: result.pages,
+        messages: result.messages,
+        webhookConfigured: cfg.webhookUrl !== undefined,
+      });
+    } catch (err) {
+      return c.json({ error: err instanceof Error ? err.message : String(err) }, 502);
     }
   });
 
