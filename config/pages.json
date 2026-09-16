@@ -1,0 +1,270 @@
+{
+  "generatedAt": "2026-09-16T09:52:07.222Z",
+  "seed": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/primary.html",
+  "pages": [
+    {
+      "slug": "primary",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/primary.html",
+      "title": "小學教育",
+      "contentChars": 81,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "primary-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/primary/index.html",
+      "title": "小學教育",
+      "contentChars": 2042,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-whole-day-schooling-background-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/whole-day-schooling/background/index.html",
+      "title": "背景",
+      "contentChars": 508,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-whole-day-schooling-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/whole-day-schooling/index.html",
+      "title": "小學全日制",
+      "contentChars": 615,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-it-in-edu-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/it-in-edu/index.html",
+      "title": "數字教育",
+      "contentChars": 11619,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-sbss-language-learning-support-featurearticle",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/sbss/language-learning-support/featurearticle.html",
+      "title": "語文學習支援",
+      "contentChars": 1244,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-sbss-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/sbss/index.html",
+      "title": "校本支援服務",
+      "contentChars": 1003,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "healthy-sch-policy-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/healthy-sch-policy/index.html",
+      "title": "健康校園政策",
+      "contentChars": 1173,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-small-class-teaching-professional-support",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/small-class-teaching/professional-support.html",
+      "title": "專業支援",
+      "contentChars": 2159,
+      "discoveredFrom": "小班教學"
+    },
+    {
+      "slug": "applicable-to-primary-small-class-teaching-papers-circulars",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/small-class-teaching/papers-circulars.html",
+      "title": "文件及通告",
+      "contentChars": 286,
+      "discoveredFrom": "小班教學"
+    },
+    {
+      "slug": "applicable-to-primary-small-class-teaching-reference",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/small-class-teaching/reference.html",
+      "title": "參考資料",
+      "contentChars": 6352,
+      "discoveredFrom": "小班教學"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-info-sch",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/info-sch.html",
+      "title": "一般資料",
+      "contentChars": 2328,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-useful-materials",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/useful-materials.html",
+      "title": "實用資料",
+      "contentChars": 889,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-briefing-sessions",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/briefing-sessions.html",
+      "title": "簡介會",
+      "contentChars": 1592,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-circulars",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/circulars.html",
+      "title": "重要通告及參考資料",
+      "contentChars": 870,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-Management-Toolkit",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/Management-Toolkit.html",
+      "title": "直接資助(直資)計劃學校管理工具庫",
+      "contentChars": 593,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-application-procedures",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/application-procedures.html",
+      "title": "申請採用「一條龍」辦學模式的方法",
+      "contentChars": 333,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-faq-sch",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/faq-sch.html",
+      "title": "「一條龍」辦學模式的常見問題(學校)",
+      "contentChars": 1046,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-introduction",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/introduction.html",
+      "title": "「一條龍」辦學模式簡介",
+      "contentChars": 299,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-faq-parent",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/faq-parent.html",
+      "title": "「一條龍」辦學模式的常見問題(家長)",
+      "contentChars": 522,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-sch-list",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/sch-list.html",
+      "title": "「一條龍」學校名單",
+      "contentChars": 597,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "spa-systems-primary-1-admission-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/spa-systems/primary-1-admission/index.html",
+      "title": "小一入學統籌辦法",
+      "contentChars": 971,
+      "discoveredFrom": "學位分配系統"
+    }
+  ],
+  "candidates": [
+    {
+      "slug": "applicable-to-primary-small-class-teaching-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/small-class-teaching/index.html",
+      "title": "小班教學",
+      "contentChars": 25,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/index.html",
+      "title": "直接資助計劃",
+      "contentChars": 187,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/index.html",
+      "title": "「一條龍」辦學模式",
+      "contentChars": 165,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "spa-systems-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/spa-systems/index.html",
+      "title": "學位分配系統",
+      "contentChars": 42,
+      "discoveredFrom": "seed"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-service-agreement-samples",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/service-agreement-samples.html",
+      "title": "服務合約樣本",
+      "contentChars": 148,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-letter-to-schools",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/letter-to-schools.html",
+      "title": "致學校信件",
+      "contentChars": 60,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-self-evaluation20checklist",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/self-evaluation%20checklist.html",
+      "title": "自評清單",
+      "contentChars": 32,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-GRSC-Corner",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/GRSC-Corner.html",
+      "title": "管治檢討小組委員會(小組委員會)資源角",
+      "contentChars": 139,
+      "discoveredFrom": "直接資助計劃"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-background",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/background.html",
+      "title": "「一條龍」辦學模式背景",
+      "contentChars": 94,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-enq-sch",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/enq-sch.html",
+      "title": "「一條龍」辦學模式的查詢(學校)",
+      "contentChars": 115,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-through-train-enq-parent",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/enq-parent.html",
+      "title": "「一條龍」辦學模式的查詢(家長)",
+      "contentChars": 116,
+      "discoveredFrom": "「一條龍」辦學模式"
+    },
+    {
+      "slug": "spa-systems-secondary-4-placement-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/spa-systems/secondary-4-placement/index.html",
+      "title": "中四學位安排機制",
+      "contentChars": 69,
+      "discoveredFrom": "學位分配系統"
+    },
+    {
+      "slug": "applicable-to-primary-secondary-direct-subsidy-scheme-dss-expansion",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/dss-expansion.html",
+      "title": "教育局",
+      "contentChars": 275,
+      "discoveredFrom": "直接資助計劃",
+      "excludedBecause": "generic title 教育局 would make a useless citation; 275 chars"
+    },
+    {
+      "slug": "spa-systems-secondary-spa-general-info-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/spa-systems/secondary-spa/general-info/index.html",
+      "title": "中學學位分配辦法內容",
+      "contentChars": 1760,
+      "discoveredFrom": "學位分配系統",
+      "excludedBecause": "secondary-school allocation, not primary education"
+    },
+    {
+      "slug": "spa-systems-student-info-management-system-index",
+      "url": "https://www.edb.gov.hk/tc/edu-system/primary-secondary/spa-systems/student-info-management-system/index.html",
+      "title": "學生資料管理系統",
+      "contentChars": 283,
+      "discoveredFrom": "學位分配系統",
+      "excludedBecause": "school admin system, not primary-education policy"
+    }
+  ]
+}
