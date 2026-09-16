@@ -103,6 +103,8 @@ export interface WatchedPage {
   slug: string;
   url: string;
   title: string;
+  /** The hub this page was reached from, or 'seed'. Used to name topics for the §5.7 message. */
+  discoveredFrom?: string;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -138,10 +140,32 @@ export function parsePages(raw: unknown): WatchedPage[] {
       throw new ConfigError(`${where} (${slug}) has an invalid url: ${url}`);
     }
 
+    const from = entry['discoveredFrom'];
     seen.add(slug);
-    pages.push({ slug, url, title });
+    pages.push({ slug, url, title, ...(typeof from === 'string' ? { discoveredFrom: from } : {}) });
   });
 
   if (pages.length === 0) throw new ConfigError('config/pages.json lists no pages. Run `pnpm discover` first.');
   return pages;
+}
+
+/**
+ * Topic names for the not-found message (§5.7 asks that these come from the reviewed
+ * allowlist rather than being invented).
+ *
+ * Hub names are used, not page titles: the pages themselves are titled things like 背景,
+ * 一般資料 and 參考資料, which would make useless suggestions. The hub a page was discovered
+ * through — 小班教學, 直接資助計劃 — is the name a parent or teacher would actually ask about.
+ */
+export function exampleTopics(pages: WatchedPage[], limit = 4): string[] {
+  const topics: string[] = [];
+  const add = (name: string): void => {
+    if (name !== '' && name !== 'seed' && !topics.includes(name)) topics.push(name);
+  };
+
+  for (const page of pages) add(page.discoveredFrom ?? '');
+  // Top up from pages reached straight off the seed, which are titled by their own topic.
+  for (const page of pages) if (page.discoveredFrom === 'seed') add(page.title);
+
+  return topics.slice(0, limit);
 }

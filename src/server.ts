@@ -2,15 +2,18 @@
  * Node entrypoint: load .env.local -> build an FsStore over ./data -> serve the Hono app.
  * Env reading lives here, never in src/lib (CLAUDE.md §4).
  */
+import { readFile } from 'node:fs/promises';
 import { serve } from '@hono/node-server';
 import { config as loadEnv } from 'dotenv';
 import { createApp } from './app.ts';
+import { parsePages } from './lib/config.ts';
 import { FsStore } from './lib/store/fs.ts';
 
 loadEnv({ path: ['.env.local', '.env'], quiet: true });
 
 const port = Number(process.env['PORT'] ?? 3000);
-const app = createApp({ store: new FsStore('data'), env: process.env });
+const pages = parsePages(JSON.parse(await readFile('config/pages.json', 'utf8')));
+const app = createApp({ store: new FsStore('data'), env: process.env, pages });
 
 const server = serve({ fetch: app.fetch, port }, (info) => {
   console.log(`EDB primary-education agent: http://localhost:${info.port}`);
