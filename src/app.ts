@@ -12,6 +12,7 @@ import { createOpenAIModel, runChat } from './lib/agent/loop.ts';
 import { runCheck } from './lib/check.ts';
 import { PoliteFetcher } from './lib/fetch/polite.ts';
 import type { Store } from './lib/store/types.ts';
+import { renderPage } from './ui/page.tsx';
 
 export interface AppDeps {
   store: Store;
@@ -23,6 +24,8 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
   const app = new Hono();
   const topics = exampleTopics(pages);
   const allowedUrls = new Set(pages.map((page) => page.url));
+
+  app.get('/', (c) => c.html(renderPage()));
 
   // Source Monitor panel: last check result, or null before the first run.
   app.get('/api/status', async (c) => {
