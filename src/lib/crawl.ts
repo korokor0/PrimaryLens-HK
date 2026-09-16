@@ -13,6 +13,7 @@ import type { Store } from './store/types.ts';
 import { isAllowed, type PoliteFetcher, type RobotsRules } from './fetch/polite.ts';
 import { normalize } from './snapshot/normalize.ts';
 import { serializeSnapshot } from './snapshot/frontmatter.ts';
+import { buildIndexFromStore } from './retrieval/index.ts';
 
 export interface CrawlDeps {
   store: Store;
@@ -87,6 +88,14 @@ export async function runCrawl(deps: CrawlDeps): Promise<CrawlResult> {
 
     results.push({ ...page, title, status: 'saved', bodyChars: normalized.body.length });
     log(`  save ${page.slug}: ${title} (${normalized.body.length} chars)`);
+  }
+
+  // §6: crawl initialises cache + snapshots + index. Rebuilt from the snapshots just written,
+  // so the index always describes the baseline rather than drifting from it.
+  if (results.some((r) => r.status === 'saved')) {
+    const index = await buildIndexFromStore(store);
+    await store.writeIndex(index);
+    log(`  index: ${index.chunkCount} chunk(s)`);
   }
 
   return {
