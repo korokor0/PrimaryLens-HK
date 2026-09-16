@@ -97,3 +97,51 @@ export function parseConfig(env: Record<string, string | undefined>, need: Need)
     botUserAgent: read(env, 'BOT_USER_AGENT') ?? DEFAULTS.botUserAgent,
   };
 }
+
+/** One entry of the reviewed allowlist in config/pages.json. */
+export interface WatchedPage {
+  slug: string;
+  url: string;
+  title: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+/**
+ * Validate config/pages.json. Hand-rolled to match parseConfig: the file is human-edited
+ * (CLAUDE.md §5.1 step 7), so a typo must produce one readable line, not a crash deep inside
+ * the crawl. Only `pages` is read; `candidates` is review material, deliberately ignored.
+ */
+export function parsePages(raw: unknown): WatchedPage[] {
+  if (!isRecord(raw) || !Array.isArray(raw['pages'])) {
+    throw new ConfigError('config/pages.json: expected an object with a "pages" array. Run `pnpm discover` first.');
+  }
+
+  const pages: WatchedPage[] = [];
+  const seen = new Set<string>();
+
+  raw['pages'].forEach((entry: unknown, index: number) => {
+    const where = `config/pages.json: pages[${index}]`;
+    if (!isRecord(entry)) throw new ConfigError(`${where} is not an object.`);
+
+    const { slug, url, title } = entry;
+    if (typeof slug !== 'string' || slug === '') throw new ConfigError(`${where} is missing a "slug".`);
+    if (typeof url !== 'string' || url === '') throw new ConfigError(`${where} (${slug}) is missing a "url".`);
+    if (typeof title !== 'string') throw new ConfigError(`${where} (${slug}) is missing a "title".`);
+    if (seen.has(slug)) throw new ConfigError(`${where}: duplicate slug "${slug}"; slugs become filenames and must be unique.`);
+
+    try {
+      new URL(url);
+    } catch {
+      throw new ConfigError(`${where} (${slug}) has an invalid url: ${url}`);
+    }
+
+    seen.add(slug);
+    pages.push({ slug, url, title });
+  });
+
+  if (pages.length === 0) throw new ConfigError('config/pages.json lists no pages. Run `pnpm discover` first.');
+  return pages;
+}
