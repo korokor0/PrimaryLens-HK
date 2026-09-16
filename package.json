@@ -1,0 +1,34 @@
+{
+  "name": "edb-primary-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.4.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "discover": "tsx scripts/discover.ts",
+    "crawl": "tsx scripts/crawl.ts",
+    "check": "tsx scripts/check.ts",
+    "eval": "tsx scripts/eval.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.1",
+    "cheerio": "^1.2.0",
+    "diff": "^9.0.0",
+    "dotenv": "^17.4.2",
+    "hono": "^4.13.8",
+    "openai": "^7.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}

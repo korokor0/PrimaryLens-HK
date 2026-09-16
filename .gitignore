@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# generated; only data/snapshots/ is committed
+data/cache/
+data/index/
+data/trace/
+data/last-check.json
+
+logs/
+*.log
+.DS_Store
