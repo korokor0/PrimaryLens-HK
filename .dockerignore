@@ -1,0 +1,22 @@
+# Never let a secret into a layer. .env.local holds the API key.
+.env
+.env.*
+!.env.example
+
+node_modules
+.git
+.gitignore
+
+# Generated at runtime; the container gets these from the mounted volume, not the image.
+data/cache
+data/index
+data/trace
+data/last-check.json
+logs
+
+# Not needed to run the service.
+tests
+docs
+*.md
+!README.md
+.DS_Store

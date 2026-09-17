@@ -9,6 +9,9 @@ data/index/
 data/trace/
 data/last-check.json
 
+# generated from docker-compose.yml.example; keep local
+docker-compose.yml
+
 logs/
 *.log
 .DS_Store

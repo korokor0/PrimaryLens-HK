@@ -1,0 +1,69 @@
+# Copy to docker-compose.yml, then: docker compose up -d
+#
+#   cp docker-compose.yml.example docker-compose.yml
+#   cp .env.example .env.local          # add OPENAI_API_KEY + OPENAI_MODEL
+#   docker compose run --rm app pnpm crawl    # one-off: build the baseline + index
+#   docker compose up -d
+#
+# `pnpm crawl` must run once before chat works, because data/index/ is generated and is not
+# committed. It takes ~35 seconds and makes 22 polite requests to edb.gov.hk.
+#
+# Secrets stay in .env.local and are read at run time; nothing is baked into the image
+# (.dockerignore excludes .env*). Note that `docker compose config` resolves env_file and
+# prints OPENAI_API_KEY in full — do not paste its output anywhere.
+
+services:
+  app:
+    build: .
+    # Pin a name so the cron line below is stable across restarts.
+    container_name: edb-agent
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    volumes:
+      # Persistent writable storage, which CLAUDE.md §11 requires for the monitoring flow:
+      # data/snapshots is the baseline, and data/{cache,index,trace} are rebuilt as it runs.
+      #
+      # A bind mount rather than a named volume, deliberately. It shadows the copy baked into
+      # the image, so the files the container compares against are the ones in your checkout —
+      # which is what lets you hand-edit data/snapshots/*.md and watch `check` notice.
+      - ./data:/app/data
+      # The reviewed allowlist. Read-only: nothing at runtime should ever rewrite it.
+      - ./config:/app/config:ro
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ---------------------------------------------------------------------------------
+  # Scheduled daily check.
+  #
+  # Nothing in the app schedules itself: `runCheck` runs only when the CLI or the UI button
+  # invokes it. Without one of the options below, this deployment serves a UI and never
+  # actually monitors anything.
+  #
+  # Option A (recommended) — host cron, which gives you real 08:00 HKT timing and a log:
+  #
+  #   TZ=Asia/Hong_Kong
+  #   0 8 * * * docker compose -f /path/to/docker-compose.yml exec -T app pnpm check >> /var/log/edb-check.log 2>&1
+  #
+  # Option B — the sidecar below. Simpler, but it is a sleep loop: it drifts, and it fires
+  # 24h after container start rather than at a wall-clock time. Uncomment if that is fine.
+  #
+  # Either way, only ONE checker should run. data/ is plain files with no locking, so two
+  # concurrent checks writing snapshots and rebuilding the index can interleave. In practice
+  # that also means: avoid clicking 「檢查更新」 while a scheduled run is in flight.
+  # ---------------------------------------------------------------------------------
+  # checker:
+  #   build: .
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env.local
+  #   volumes:
+  #     - ./data:/app/data
+  #     - ./config:/app/config:ro
+  #   entrypoint: ["/bin/sh", "-c"]
+  #   command: ["while true; do pnpm check || true; sleep 86400; done"]
