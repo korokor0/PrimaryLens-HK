@@ -38,7 +38,7 @@ and the reviewer reads this history to see how the work was built.
 
 Also commit immediately after:
 
-- a dependency change (add/remove) — the commit body records **why** it exists (`CLAUDE.md` §8)
+- a dependency change (add/remove) — the commit body names the dependency
 - a bug fix that has a reproducing test
 - any environment/toolchain fix that a fresh clone depends on (lockfile, `pnpm-workspace.yaml`, tsconfig)
 - finishing a doc file
@@ -55,9 +55,8 @@ Never `git add -A` blindly. Stage named paths, then `git diff --cached --stat` b
 
 ## 4. Never commit — hard stops
 
-- `.env`, `.env.local`, or any real API key, token or bearer secret
-  **The `sub2api.crh.moe` key was pasted into a chat transcript. It belongs only in `.env.local`, which is
-  gitignored. Grep the staged diff for `sk-` before every commit.**
+- `.env`, `.env.local`, or any real API key, token or bearer secret — keys live only in `.env.local`
+- `docs/` and `quick_start_zh.md` — kept locally, never committed (both are gitignored)
 - `node_modules/`
 - `data/cache/`, `data/index/`, `data/trace/`, `data/last-check.json` — all generated, all gitignored
 - real scraped EDB HTML outside `data/snapshots/` (bulk, noisy, no grading value)
@@ -75,30 +74,23 @@ git diff --cached | grep -nE 'sk-[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,}' &&
   COMMITTED. Committing snapshots is required, not an accident.
 - `config/pages.json` — the human-reviewed allowlist
 - `pnpm-lock.yaml` and `pnpm-workspace.yaml` — §12 requires the lockfile committed
-- `docs/AI_LOG.md` — append the step's entry in the *same* commit as the step
 
 ## 6. Message format
 
 ```
 <type>: <imperative subject, <= 72 chars>
 
-<why, not what — the diff shows what>
-<AI disclosure when the code is mostly AI-drafted>
-<dependency rationale when deps changed>
+- <what changed>
+- <what changed>
 ```
 
-Types: `feat` `fix` `chore` `test` `docs` `refactor`.
+Types: `feat` `fix` `chore` `test` `docs` `refactor` `build`.
 
-`CLAUDE.md` §8 requires honest AI disclosure. When a commit is mostly AI-drafted, the body says so and
-names what the human actually reviewed — e.g.:
-
-```
-Mostly AI-drafted. Human reviewed: the 304 branch in runCheck, and the
-rule that baseline advances only after notify succeeds.
-```
-
-Never write a disclosure that overstates human review. `docs/TECH_NOTE.md` is generated from this history
-and `docs/AI_LOG.md`, so a dishonest line here becomes a dishonest submission.
+- The body is optional. When present, it is a short list of **what** the commit changes.
+- **No trailers** — no `Co-Authored-By`, no `Signed-off-by`, no generated-with lines.
+- **No process content** — no investigation narrative, failed attempts, measurements, provider
+  outages, or notes on who drafted what. Describe the change, not how it was arrived at. That
+  context stays out of git.
 
 ## 7. Things that always need an explicit ask
 

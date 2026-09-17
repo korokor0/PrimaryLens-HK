@@ -15,3 +15,7 @@ docker-compose.yml
 logs/
 *.log
 .DS_Store
+
+# local only, never committed
+docs/
+quick_start_zh.md

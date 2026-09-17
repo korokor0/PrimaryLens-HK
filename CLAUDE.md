@@ -11,6 +11,29 @@ Smaller and working beats bigger and unfinished.
 
 Read this file fully before writing code. If a requested change conflicts with this file, ask before changing the architecture.
 
+> **Status — build complete.** All §10 steps 1–9 done and verified end-to-end; 19 commits; `pnpm test && pnpm typecheck` green (5 files, 19 assertions). Every departure from this spec is indexed in **§0** and argued in `docs/AI_LOG.md`, which `docs/TECH_NOTE.md` is written from. Still the human's: browser click-through of both pages, the demo video (§10 step 10), a real `BOT_USER_AGENT` contact, and rotating the API key after submission.
+
+---
+
+## 0. As built — where the implementation departs from this spec
+
+Each item is also noted in place below as **As built:**. Reasons and measurements are in `docs/AI_LOG.md`.
+
+- **Discovery is two hops for hub pages, not one.** The seed's own links include hubs holding 25–187 content chars; a literal one-hop allowlist had almost nothing to cite. The seed is always kept. Unselected candidates are written to `candidates` in `config/pages.json` so review never means re-crawling. (§5.1)
+- **Retrieval scoring is not the raw `Σ tf×idf` sum.** That sum ranked *"How do I cook pasta?"* and an injection string above covered questions. Implemented: matched-IDF-mass ÷ total-query-IDF-mass with per-term saturation, a **≥3 distinct matching terms** rule, and a mixed tokeniser (CJK bigrams; Latin whole words with a stopword list). Threshold **0.10**. (§5.5)
+- **The final model call omits both `tools` and `tool_choice`.** The API rejects `tool_choice:"none"` unless `tools` is present. (§5.6)
+- **`OPENAI_QUERY_MODEL`** (optional) runs the search-term call on a cheaper model; the answer always uses `OPENAI_MODEL`. (§2, §4, §5.6)
+- **No volatile-string stripper.** 最後更新 never appears in visible content — EDB keeps the date in an inline script outside the content container. Writing one would be dead code. (§5.2)
+- **EDB sends no `ETag`/`Last-Modified` and ignores `If-Modified-Since`.** The 304 branch is implemented and proven by test 3 with an injected fetch layer; it never fires against the live site. (§5.1, §9)
+- **Whitespace-only drift** (hash differs, no sentence differs) is accepted silently with no notification. `--dry-run`/`--simulate` write nothing at all, `last-check.json` and traces included; `--simulate` also skips `robots.txt`. `/api/check` returns **409** while a run is in flight. (§5.3)
+- **Example topics come from hub names** (小班教學, 直接資助計劃…), not page titles (背景, 一般資料). The English fallback keeps Chinese topic names and says the pages are Traditional Chinese, because English terms cannot match this corpus. (§5.7)
+- **A second, read-only `/status` page** (server-rendered, zero JavaScript, triggers nothing) was added on request. (§7)
+- **Not built:** `/api/trace` (the activity panel is fed by the trace inside the `/api/chat` response, and JSONL files exist, so §1.2 is met without it), `scripts/eval.ts` (cut; the three cases are in `docs/DEMO.md`), `src/worker.ts` (Option B not attempted). (§3, §11)
+- **Added:** `domhandler` as a type-only devDependency (cheerio does not re-export its DOM types); `Dockerfile`, `.dockerignore`, `docker-compose.yml.example` for Option A — **unbuilt**, no Docker daemon on the dev machine; `quick_start.md`, `quick_start_zh.md`; `git.md` (commit policy). (§2, §3, §11)
+- **`corepack enable` does not exist on Node 25+.** README leads with `npm install -g pnpm@12`. (§6)
+- **Config validation is hand-rolled**, not zod, as decided at step 1. (§10)
+- **Observed for real:** EDB changed 小一入學統籌辦法; a `pnpm crawl` absorbed it silently instead of `check` reporting it — exactly the §5.2 warning. The new markup (styling `<div>`s inside `<li>`) also broke normalization; fixed and locked into the fixture. (§5.2, §9)
+
 ---
 
 ## 1. Rubric — each line is a graded checkbox
@@ -85,13 +108,14 @@ Non-goals:
   - `OPENAI_API_KEY`
   - `OPENAI_BASE_URL`
   - `OPENAI_MODEL`
+  - `OPENAI_QUERY_MODEL` — **as built**, optional: cheaper model for the search-term call only; unset = single model.
   - README says only: “OpenAI-compatible Chat Completions endpoint with native function calling. Tested with: <providers actually tested>.”
   - No JSON tool fallback and no claims about providers not actually tested.
-- **Retrieval:** character-bigram TF-IDF, ~40–60 lines, no library, no embeddings.
+- **Retrieval:** character-bigram TF-IDF, no library, no embeddings. **As built:** CJK bigrams + Latin whole words, IDF-coverage scoring with a ≥3-distinct-terms rule (§5.5); ~90 lines of logic, ~215 with the comments that explain the calibration.
 - **Storage:** files under `data/`; committed editable snapshots, everything else generated/ignored.
-- **HTTP / HTML / diff / hash:** native `fetch`, `cheerio` (pure JS, Workers-safe), `diff`, `crypto.subtle.digest('SHA-256')`.
+- **HTTP / HTML / diff / hash:** native `fetch`, `cheerio` (pure JS, Workers-safe), `diff`, `crypto.subtle.digest('SHA-256')`. **As built:** plus `domhandler@5.0.3` as a type-only devDependency, version-matched to cheerio's own, because cheerio does not re-export `AnyNode`/`Element`.
 - **Notify:** one generic webhook via `WEBHOOK_URL`. Telegram is optional only if everything else is finished.
-- **UI:** one page rendered with `hono/jsx` (`src/ui/page.tsx`) plus one inline `<script>` of plain browser JS that calls the API. No client framework, no Tailwind build step (a `<style>` block is enough).
+- **UI:** one page rendered with `hono/jsx` (`src/ui/page.tsx`) plus one inline `<script>` of plain browser JS that calls the API. No client framework, no Tailwind build step (a `<style>` block is enough). **As built:** plus a read-only `/status` page (`src/ui/status.tsx`, no JavaScript) sharing the same stylesheet.
 - **Tests:** Vitest on Node, five high-value tests only, all against `MemoryStore`.
 
 Before building the agent, manually verify once that the chosen `OPENAI_BASE_URL` + model supports native function calling. If not, switch endpoint/model; do not build a compatibility layer.
@@ -104,6 +128,9 @@ Before building the agent, manually verify once that the chosen `OPENAI_BASE_URL
 .
 ├── CLAUDE.md
 ├── README.md
+├── quick_start.md / quick_start_zh.md   # as built
+├── git.md                              # as built: commit policy
+├── Dockerfile / .dockerignore / docker-compose.yml.example   # as built, §11 Option A, unbuilt locally
 ├── .env.example
 ├── package.json
 ├── pnpm-lock.yaml
@@ -123,7 +150,7 @@ Before building the agent, manually verify once that the chosen `OPENAI_BASE_URL
 │   ├── discover.ts
 │   ├── crawl.ts
 │   ├── check.ts
-│   └── eval.ts             # cut if time is tight
+│   └── eval.ts             # NOT BUILT — cut; the three cases are in docs/DEMO.md
 ├── src/
 │   ├── lib/                # Web-standard only; no node:* except store/fs.ts
 │   │   ├── config.ts       # parseConfig(env: Record<string,string|undefined>, need: 'chat'|'monitor')
@@ -152,11 +179,12 @@ Before building the agent, manually verify once that the chosen `OPENAI_BASE_URL
 │   │   │   └── summarize.ts
 │   │   ├── crawl.ts        # runCrawl(store, cfg)
 │   │   └── check.ts        # runCheck(store, cfg, opts) — the one lifecycle used by CLI, API and cron
-│   ├── app.ts              # Hono app factory: createApp({ store, env }) → routes /, /api/chat, /api/check, /api/trace, /api/status
+│   ├── app.ts              # Hono app factory: createApp({ store, env, pages }) → routes /, /status, /api/chat, /api/check, /api/status  (no /api/trace — not needed, see §0)
 │   ├── ui/
-│   │   └── page.tsx        # hono/jsx page + inline <script>
+│   │   ├── page.tsx        # hono/jsx page + inline <script>
+│   │   └── status.tsx      # as built: read-only status page, no JS
 │   ├── server.ts           # Node entry: dotenv → FsStore → createApp → @hono/node-server
-│   └── worker.ts           # POST-FREEZE ONLY: Workers entry { fetch, scheduled } with KvStore
+│   └── worker.ts           # NOT BUILT — Option B not attempted
 └── tests/
     └── fixtures/
 ```
@@ -169,6 +197,7 @@ Before building the agent, manually verify once that the chosen `OPENAI_BASE_URL
 OPENAI_API_KEY=
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=
+OPENAI_QUERY_MODEL=          # as built, optional
 WEBHOOK_URL=
 EDB_SEED_URL=https://www.edb.gov.hk/tc/edu-system/primary-secondary/primary.html
 FETCH_DELAY_MS=1500
@@ -201,6 +230,8 @@ Discovery:
 6. Write `config/pages.json`.
 7. Human-review that file and commit it.
 
+**As built:** one further hop for links that measure as hubs (< 400 content chars and ≥ 2 links — the observed gap is 187 vs 508). The seed is always kept regardless of size. Everything seen but not selected is written to `candidates` in `pages.json`, so promoting a page is an edit, not another crawl. Three pages were demoted by hand: two secondary-education pages (EDB's path prefix is literally `primary-secondary`) and one titled merely 教育局.
+
 Runtime:
 
 - Allowlist only. Never recursively follow arbitrary links.
@@ -231,6 +262,8 @@ Conditional GET:
 - Never short-circuit snapshot comparison merely because the server returned 304.
 
 This rule is critical because the reviewer may edit the snapshot while the remote EDB page remains unchanged.
+
+**As built:** verified against the live site that EDB sends **no** `ETag` or `Last-Modified` and ignores `If-Modified-Since` (still 200). Conditional GET is implemented, but a real 304 never occurs; the branch is proven by §9 test 3 with an injected fetch layer.
 
 ---
 
@@ -271,6 +304,8 @@ Rules:
 - Unicode NFC
 - strip zero-width characters
 - strip volatile non-content strings such as “最後更新日期” when appropriate
+
+**As built:** no volatile stripper — that string never appears in visible content (it lives in an inline script variable outside the content container, which `extract.ts` already excludes). EDB pages have **no h2–h6**, so a standalone `<strong>` at the start of a line or after a finished sentence is promoted to `##`; layout-table cells become lines; a `<div>`/`<span>` inside a list item counts as structure only if it wraps something structural, and empty `<ul>` CMS artifacts never do; punctuation-only lines are dropped.
 
 `crawl` is a **baseline initialisation/reset command**. It may write snapshots.
 
@@ -350,6 +385,8 @@ Hard rules:
 - intended only for a deterministic demo
 
 The real reviewer hand-edit test still uses normal `pnpm check`.
+
+**As built:** a hash difference with no sentence difference (whitespace drift) is accepted quietly with no notification. `--dry-run` and `--simulate` write nothing at all — not `last-check.json`, not traces; `--simulate` also skips `robots.txt`. `/api/check` returns 409 while a run is already in flight in that process. When the baseline advances it also adopts the live page's title.
 
 ---
 
@@ -437,6 +474,19 @@ Score:
 + exact phrase bonus
 ```
 
+**As built** — the raw sum above does not separate covered from uncovered on this corpus (it ranked *"How do I cook pasta?"* at 5.45 and an injection string at 7.53, above covered questions at 3.98). Implemented instead:
+
+```text
+score(chunk) = Σ over matched query terms q of  idf(q) · w/(w+1)
+               ─────────────────────────────────────────────────   (+ 0.15 if the whole query appears verbatim)
+               Σ over ALL query terms q of  idf(q)        with unseen q charged idf = ln(1+N)
+
+               w = tf_body(q) + 0.5 · tf_heading(q)
+               and a chunk must match ≥ 3 distinct query terms (or all, for shorter queries) to score at all
+```
+
+Tokens: character bigrams for CJK; whole words for Latin/digits, minus an English stopword list (two-letter Latin fragments matched English publication titles in the corpus; "is"/"the" carried maximum IDF because they are rare in a Chinese corpus).
+
 Rationale:
 
 - plain whitespace tokenisation is unsuitable for Chinese
@@ -463,6 +513,8 @@ Calibrate a fixed no-evidence threshold after manually checking at least:
 - 2 unrelated questions
 
 Do not pretend the threshold is scientifically evaluated; document it as a PoC heuristic.
+
+**As built:** calibrated over 41 queries (15 covered, 12 short single-topic, 3 partially supported, 14 unrelated/injection); re-verified after the normalize fix on 8 covered / 6 unrelated: covered **0.312–1.052**, unrelated **all exactly 0.000**. **Threshold = 0.10.** A PoC heuristic; re-calibrate for any other corpus. Corpus: 22 pages, 104 chunks.
 
 ---
 
@@ -525,6 +577,8 @@ This flow is deliberately bounded: **one tool call per user turn**.
 
 No autonomous loop and no repeated searching in v1.
 
+**As built:** the API rejects `tool_choice:"none"` unless `tools` is also present, so step 6 disables tool use by **omitting both**. Call 1 may run on `OPENAI_QUERY_MODEL`; call 2 always on `OPENAI_MODEL`; the trace names the model per stage. The tool definition is deep-frozen because it is one shared object handed to the SDK on every request. Off-topic questions therefore cost exactly one cheap call — the retrieval threshold *is* the abuse gate, and unlike an LLM classifier it cannot be prompt-injected.
+
 ---
 
 ### 5.7 Grounding and citations
@@ -560,6 +614,8 @@ English:
 
 Pick the language by a trivial heuristic (any CJK character in the input → Chinese). Build the example-topic list from the actual titles in `config/pages.json` after discovery.
 
+**As built:** the list is built from the **hub names** pages were discovered through (小班教學, 直接資助計劃, 「一條龍」辦學模式, 學位分配系統), because the page titles themselves are 背景, 一般資料, 參考資料 — useless as suggestions. The English message keeps the Chinese topic names and says the pages are published in Traditional Chinese; suggesting English topics would send the reader into a second dead end, since an English term cannot match this corpus. Every URL in the answer must be in this turn's hits *and* the allowlist, both compared in canonical form.
+
 Prepare three demo/eval cases:
 
 1. covered
@@ -571,7 +627,7 @@ Prepare three demo/eval cases:
 ## 6. Commands — fresh clone
 
 ```bash
-corepack enable
+npm install -g pnpm@12   # as built: corepack is not bundled with Node 25+; `corepack enable` only on Node ≤ 24
 pnpm install
 cp .env.example .env.local
 
@@ -585,7 +641,7 @@ pnpm check           # tsx scripts/check.ts
 pnpm check -- --dry-run
 pnpm check -- --simulate "全日制::半日制"
 
-pnpm eval            # cut if time is tight
+# pnpm eval — NOT BUILT (cut); the three demo cases are in docs/DEMO.md
 pnpm test            # vitest run
 pnpm typecheck       # tsc --noEmit
 ```
@@ -611,7 +667,7 @@ A GitHub Actions scheduled check may be mentioned as a possible next step, not r
 
 ## 7. UI
 
-One page only.
+One page only. **As built:** one main page as specified, plus a read-only `/status` page added on request — server-rendered, zero JavaScript, shows configuration (never the key), index state, the last check and each page's snapshot age, and can trigger nothing.
 
 Recommended structure:
 
@@ -666,6 +722,8 @@ Rules:
 
 ## 9. Tests — exactly five unless a real bug demands another
 
+**As built:** five files, 19 assertions, all against `MemoryStore`. The normalize fixture was extended for a real bug (styling `<div>`s inside `<li>`), and the grounding test asserts the optional query-model routing.
+
 1. **Normalize**
    - fixture HTML -> navigation/footer/volatile noise removed, real main text preserved.
 
@@ -704,6 +762,8 @@ Tests never access the real EDB site.
 | 7 | `page.tsx` UI + status/activity wiring | 0.75 h |
 |  | **Feature freeze** | **8 h** |
 
+**As built:** step 1 used hand-rolled config validation, not zod. All steps 1–9 completed and verified; post-freeze changes since (all recorded in `docs/AI_LOG.md`): deep-frozen tool definition, quick starts, Docker files, a review pass fixing eight latent bugs, the normalize fix for EDB's new markup, `/status`, `OPENAI_QUERY_MODEL`.
+
 After freeze:
 
 | Step | Work | Budget |
@@ -739,6 +799,8 @@ Do **not** cut:
 
 The **submission path is local Node** (`pnpm dev`, edit a `.md`, `pnpm check`). That is what reviewers run and what the video shows. Never let a deployment change local semantics.
 
+**As built:** `Dockerfile` + `docker-compose.yml.example` implement Option A — bind-mounted `./data` so the hand-edit test still works, host cron for the daily check, `.dockerignore` keeping `.env.local` out of the image. **Never built or started**: no Docker daemon on the dev machine. Option B was not attempted.
+
 **Option A — own VPS (≤ 30 min):** `pnpm start` behind a reverse proxy, `FsStore`, system cron running `pnpm check`. Persistent disk, nothing to redesign. Take this if a box is already available.
 
 **Option B — Cloudflare Workers (stretch, only after §10 freeze and §12 all green, ≤ 2 h, abandon if over):**
@@ -754,26 +816,28 @@ Tech-note line either way: *"`src/lib` has no Node dependencies and all state go
 
 ## 12. Definition of done — run as the interviewer
 
-- [ ] Covered question -> real tool call visible, result grounded, valid EDB citation.
-- [ ] Uncovered question -> deterministic not-found response, no invented fact.
-- [ ] Injection/mixed question -> source boundary remains enforced.
-- [ ] Tool trace contains structured call/result/timing and no chain-of-thought.
-- [ ] Hand-edit one sentence in `data/snapshots/*.md` -> `pnpm check` detects it even if the HTTP request resolves through cached 304 handling.
-- [ ] Change -> readable sentence/section diff.
-- [ ] Webhook configured -> receives plain-language JSON/message.
-- [ ] No webhook -> check still succeeds and clearly reports notification skipped.
-- [ ] Successful/explicitly-skipped notification -> baseline replaced + index rebuilt.
-- [ ] Run check a second time -> `status=unchanged`.
-- [ ] Webhook failure -> old baseline remains so next run retries.
-- [ ] `--dry-run` never notifies or writes.
-- [ ] `--simulate` performs no EDB network request and no snapshot write.
-- [ ] `crawl` and `check` semantics are clearly distinguished in README.
-- [ ] Missing LLM config produces a readable chat/eval error, not a stack trace; monitoring commands still work.
-- [ ] Fresh clone + README alone reaches a working demo.
-- [ ] `pnpm test && pnpm typecheck` passes.
-- [ ] `grep -r "node:" src/lib` returns only `src/lib/store/fs.ts`; `grep -r "process.env" src/lib` returns nothing.
-- [ ] `pnpm-lock.yaml` committed; no secrets, dead code, placeholder claims, or fake live data.
-- [ ] `docs/TECH_NOTE.md` <= 1 page and truthfully covers:
+All items verified; evidence per item in `docs/AI_LOG.md`.
+
+- [x] Covered question -> real tool call visible, result grounded, valid EDB citation.
+- [x] Uncovered question -> deterministic not-found response, no invented fact.
+- [x] Injection/mixed question -> source boundary remains enforced.
+- [x] Tool trace contains structured call/result/timing and no chain-of-thought.
+- [x] Hand-edit one sentence in `data/snapshots/*.md` -> `pnpm check` detects it even if the HTTP request resolves through cached 304 handling.
+- [x] Change -> readable sentence/section diff.
+- [x] Webhook configured -> receives plain-language JSON/message.
+- [x] No webhook -> check still succeeds and clearly reports notification skipped.
+- [x] Successful/explicitly-skipped notification -> baseline replaced + index rebuilt.
+- [x] Run check a second time -> `status=unchanged`.
+- [x] Webhook failure -> old baseline remains so next run retries.
+- [x] `--dry-run` never notifies or writes.
+- [x] `--simulate` performs no EDB network request and no snapshot write.
+- [x] `crawl` and `check` semantics are clearly distinguished in README.
+- [x] Missing LLM config produces a readable chat/eval error, not a stack trace; monitoring commands still work.
+- [x] Fresh clone + README alone reaches a working demo.
+- [x] `pnpm test && pnpm typecheck` passes.
+- [x] `grep -r "node:" src/lib` returns only `src/lib/store/fs.ts`; `grep -r "process.env" src/lib` returns nothing.
+- [x] `pnpm-lock.yaml` committed; no secrets, dead code, placeholder claims, or fake live data.
+- [x] `docs/TECH_NOTE.md` <= 1 page and truthfully covers:
   - what was built
   - what AI drafted
   - what I changed
