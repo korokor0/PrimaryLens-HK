@@ -13,6 +13,8 @@ import { runCheck } from './lib/check.ts';
 import { PoliteFetcher } from './lib/fetch/polite.ts';
 import type { Store } from './lib/store/types.ts';
 import { renderPage } from './ui/page.tsx';
+import { renderStatusPage, type StatusView } from './ui/status.tsx';
+import { parseSnapshot } from './lib/snapshot/frontmatter.ts';
 
 export interface AppDeps {
   store: Store;
@@ -26,6 +28,59 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
   const allowedUrls = new Set(pages.map((page) => page.url));
 
   app.get('/', (c) => c.html(renderPage()));
+
+  // Read-only operational view. Reads the same Store the checker writes; triggers nothing.
+  const startedAt = new Date();
+  app.get('/status', async (c) => {
+    const now = new Date();
+    const [lastCheck, index] = await Promise.all([store.readStatus(), store.readIndex()]);
+    const byStatus = new Map((lastCheck?.pages ?? []).map((p) => [p.slug, p] as const));
+
+    const rows = await Promise.all(
+      pages.map(async (page) => {
+        const markdown = await store.readSnapshot(page.slug);
+        const meta = markdown === null ? {} : parseSnapshot(markdown).meta;
+        const last = byStatus.get(page.slug);
+        return {
+          slug: page.slug,
+          title: meta['title'] ?? page.title,
+          url: page.url,
+          hasSnapshot: markdown !== null,
+          fetchedAt: meta['fetched_at'],
+          status: last?.status,
+          note: last?.note,
+        };
+      }),
+    );
+
+    // Config is reported as configured / not configured. The key itself is never rendered.
+    let chat: StatusView['chat'];
+    try {
+      const cfg = parseConfig(env, 'chat');
+      chat = { configured: true, model: cfg.openaiModel, baseUrl: cfg.openaiBaseUrl };
+    } catch (err) {
+      chat = { configured: false, error: err instanceof ConfigError ? err.message : String(err) };
+    }
+    let monitor: StatusView['monitor'];
+    try {
+      const cfg = parseConfig(env, 'monitor');
+      monitor = { webhookConfigured: cfg.webhookUrl !== undefined, fetchDelayMs: cfg.fetchDelayMs };
+    } catch (err) {
+      monitor = { webhookConfigured: false, error: err instanceof ConfigError ? err.message : String(err) };
+    }
+
+    return c.html(
+      renderStatusPage({
+        startedAt,
+        now,
+        chat,
+        monitor,
+        index: index === null ? null : { builtAt: index.builtAt, chunkCount: index.chunkCount },
+        lastCheck,
+        rows,
+      }),
+    );
+  });
 
   // Source Monitor panel: last check result, or null before the first run.
   app.get('/api/status', async (c) => {

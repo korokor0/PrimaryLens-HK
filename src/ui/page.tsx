@@ -171,7 +171,7 @@ const CLIENT_JS = `/* Plain browser JS. No framework, no build step, no CDN (CLA
 })();
 `;
 
-const STYLES = `
+export const STYLES = `
 :root {
   --bg: #f6f7f9; --panel: #fff; --ink: #14181f; --muted: #626b7a; --line: #e2e6ec;
   --accent: #1d4ed8; --ok: #0f7b4f; --warn: #a15c00; --err: #b3261e; --code: #f1f3f7;
@@ -254,7 +254,7 @@ function Page() {
         <div class="wrap">
           <header>
             <h1>教育局「小學教育」監察 Agent</h1>
-            <p>只根據監察中的教育局頁面作答，並偵測頁面內容變更。</p>
+            <p>只根據監察中的教育局頁面作答，並偵測頁面內容變更。 · <a href="/status">系統狀態</a></p>
           </header>
 
           <div class="grid">
