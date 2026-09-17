@@ -122,7 +122,7 @@ const CLIENT_JS = `/* Plain browser JS. No framework, no build step, no CDN (CLA
     var last = data && data.lastCheck;
     $('watched').textContent = data && data.watchedPages != null ? data.watchedPages : '–';
     if (!last) { $('lastcheck').textContent = '尚未檢查'; return; }
-    $('lastcheck').textContent = new Date(last.checkedAt).toLocaleString('zh-HK', { hour12: false }) +
+    $('lastcheck').textContent = new Date(last.checkedAt).toLocaleString('zh-HK', { hourCycle: 'h23' }) +
       ' · ' + last.status + ' · 變更 ' + last.changedPages + ' 頁';
   }
 

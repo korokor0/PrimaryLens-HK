@@ -87,7 +87,14 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
 
   // 「檢查更新」 button. Runs exactly the same runCheck() as `pnpm check` — one lifecycle,
   // two entrypoints (§6), so the UI can never drift from what cron does.
+  // data/ is plain files with no locking, so two checks in this process must never overlap.
+  // The UI disables its button while a run is in flight; this guards the API itself.
+  let checkInFlight = false;
+
   app.post('/api/check', async (c) => {
+    if (checkInFlight) {
+      return c.json({ error: 'A check is already running. Wait for it to finish, then try again.' }, 409);
+    }
     let cfg;
     try {
       cfg = parseConfig(env, 'monitor');
@@ -96,6 +103,7 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
     }
 
     const fetcher = new PoliteFetcher({ userAgent: cfg.botUserAgent, delayMs: cfg.fetchDelayMs });
+    checkInFlight = true;
     try {
       const robots = await fetcher.loadRobots(new URL(cfg.seedUrl).origin);
       const result = await runCheck({ store, fetcher, pages, robots, webhookUrl: cfg.webhookUrl });
@@ -109,6 +117,8 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
       });
     } catch (err) {
       return c.json({ error: err instanceof Error ? err.message : String(err) }, 502);
+    } finally {
+      checkInFlight = false;
     }
   });
 

@@ -89,7 +89,13 @@ export async function runCheck(deps: CheckDeps, options: CheckOptions = {}): Pro
       continue;
     }
     const { meta, body: baseline } = parseSnapshot(snapshotFile);
-    const title = meta['title'] ?? page.title;
+    // The baseline's title. Replaced by the live page's title when the baseline advances,
+    // otherwise a page EDB renames would keep its old title in every future citation.
+    let title = meta['title'] ?? page.title;
+    const adopt = (normalized: { title: string; body: string }): string => {
+      if (normalized.title !== '') title = normalized.title;
+      return normalized.body;
+    };
 
     // ---- Candidate: the current live representation, normalized in memory ----
     let candidate: string;
@@ -114,7 +120,7 @@ export async function runCheck(deps: CheckDeps, options: CheckOptions = {}): Pro
       if (result.status === 304) {
         if (cached?.html !== undefined && cached.html !== '') {
           // 304 is a transport result, not a comparison result: fall through and diff.
-          candidate = normalize(cached.html, page.url).body;
+          candidate = adopt(normalize(cached.html, page.url));
         } else {
           // Cached body missing or corrupt: retry once without conditional headers (§5.1).
           const retry = await fetcher.get(page.url);
@@ -124,11 +130,11 @@ export async function runCheck(deps: CheckDeps, options: CheckOptions = {}): Pro
             continue;
           }
           freshHtml = retry.html;
-          candidate = normalize(retry.html, page.url).body;
+          candidate = adopt(normalize(retry.html, page.url));
         }
       } else if (result.status === 200 && result.html !== null) {
         freshHtml = result.html;
-        candidate = normalize(result.html, page.url).body;
+        candidate = adopt(normalize(result.html, page.url));
       } else {
         statuses.push({ ...base, status: 'failed', note: `HTTP ${result.status}` });
         log(`  fail ${page.slug}: HTTP ${result.status}`);

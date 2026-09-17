@@ -59,9 +59,11 @@ function isElement(node: AnyNode): node is Element {
   return node.type === 'tag';
 }
 
+const STRUCTURAL_SELECTOR = [...STRUCTURAL].join(',');
+
 /** Does this subtree contain any element that carries document structure? */
 function containsStructural($: cheerio.CheerioAPI, el: Element): boolean {
-  return $(el).find([...STRUCTURAL].join(',')).length > 0;
+  return $(el).find(STRUCTURAL_SELECTOR).length > 0;
 }
 
 /**

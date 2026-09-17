@@ -14,9 +14,12 @@ data/trace
 data/last-check.json
 logs
 
-# Not needed to run the service.
+# Not needed to run the service. Root docs are named explicitly rather than via `*.md`, so
+# there is no way to misread the rule as also excluding data/snapshots/*.md.
 tests
 docs
-*.md
-!README.md
+CLAUDE.md
+git.md
+quick_start.md
+quick_start_zh.md
 .DS_Store

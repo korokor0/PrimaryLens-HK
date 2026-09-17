@@ -20,7 +20,7 @@ export function formatHongKongTime(when: Date): string {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false,
+    hourCycle: 'h23',
   }).formatToParts(when);
   const get = (type: string): string => parts.find((part) => part.type === type)?.value ?? '';
   return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')} HKT`;

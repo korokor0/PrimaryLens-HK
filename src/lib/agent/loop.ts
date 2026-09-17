@@ -102,7 +102,10 @@ export function sanitizeUrls(answer: string, allowed: Set<string>): { text: stri
 }
 
 export async function runChat(deps: ChatDeps, question: string): Promise<ChatResult> {
-  const { model, index, allowedUrls, exampleTopics } = deps;
+  const { model, index, exampleTopics } = deps;
+  // Canonicalise the allowlist once so the membership test below compares like with like:
+  // hits are canonicalised, and a raw `http://` or fragment-bearing entry would never match.
+  const allowedUrls = new Set([...deps.allowedUrls].map(canonical));
   const threshold = deps.threshold ?? NO_EVIDENCE_THRESHOLD;
   const trace = newTrace(question);
   const startedAt = Date.now();

@@ -28,6 +28,9 @@ export const EMPTY_ROBOTS: RobotsRules = { disallow: [], fetched: false };
 export function parseRobots(text: string, userAgent: string): string[] {
   const disallow: string[] = [];
   let applies = false;
+  // A group may list several User-agent lines before its rules. Once rules have been seen,
+  // the next User-agent line starts a fresh group; until then, any matching line joins it.
+  let groupHasRules = false;
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.replace(/#.*$/, '').trim();
     if (line === '') continue;
@@ -36,9 +39,14 @@ export function parseRobots(text: string, userAgent: string): string[] {
     const field = line.slice(0, sep).trim().toLowerCase();
     const value = line.slice(sep + 1).trim();
     if (field === 'user-agent') {
-      applies = value === '*' || userAgent.toLowerCase().startsWith(value.toLowerCase());
-    } else if (field === 'disallow' && applies && value !== '') {
-      disallow.push(value);
+      if (groupHasRules) {
+        applies = false;
+        groupHasRules = false;
+      }
+      applies = applies || value === '*' || userAgent.toLowerCase().startsWith(value.toLowerCase());
+    } else if (field === 'disallow') {
+      groupHasRules = true;
+      if (applies && value !== '') disallow.push(value);
     }
   }
   return disallow;
@@ -107,18 +115,25 @@ export class PoliteFetcher {
     });
   }
 
-  /** GET with one retry. Network errors and 5xx are retried once; 4xx is not. */
+  /**
+   * GET with at most one retry (§5.1). Network errors and 5xx are retried once; 4xx is not.
+   * Written as a two-iteration loop on purpose: the earlier try/catch version could make a
+   * third request when a 5xx retry itself threw, quietly breaking the "at most one" rule.
+   */
   async get(url: string, validators?: Validators): Promise<FetchResult> {
-    let response: Response;
-    try {
-      response = await this.attempt(url, validators);
-      if (response.status >= 500) response = await this.attempt(url, validators);
-    } catch {
+    let response: Response | undefined;
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2 && response === undefined; attempt += 1) {
       try {
-        response = await this.attempt(url, validators);
+        const candidate = await this.attempt(url, validators);
+        if (candidate.status >= 500 && attempt === 0) continue;
+        response = candidate;
       } catch (err) {
-        throw new Error(`fetch failed for ${url}: ${err instanceof Error ? err.message : String(err)}`);
+        lastError = err;
       }
+    }
+    if (response === undefined) {
+      throw new Error(`fetch failed for ${url}: ${lastError instanceof Error ? lastError.message : String(lastError)}`);
     }
 
     const etag = response.headers.get('etag') ?? undefined;
