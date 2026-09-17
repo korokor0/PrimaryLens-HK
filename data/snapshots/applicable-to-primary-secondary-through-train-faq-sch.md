@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/through-train/faq-sch.html
 title: 「一條龍」辦學模式的常見問題(學校)
-fetched_at: 2026-09-16T10:39:30.325Z
+fetched_at: 2026-09-17T16:09:01.966Z
 ---
 
 ## 1. 「一條龍」辦學模式的理念是什麼？

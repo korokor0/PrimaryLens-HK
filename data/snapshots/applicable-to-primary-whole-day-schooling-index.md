@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/whole-day-schooling/index.html
 title: 小學全日制
-fetched_at: 2026-09-16T10:39:09.327Z
+fetched_at: 2026-09-17T16:08:40.936Z
 ---
 
 自推行以來，公眾普遍認同全日制小學較半日制小學能更有效地提升學生的學習能力及全人發展。現時，全港共有400多間全日制小學，分佈於香港各地區。 這些政府、資助及直資的全日制小學，為全港小學生提供足夠的學位。增加了的課時及教育局提供的額外資源提高了小學教育的質素。

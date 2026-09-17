@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/primary.html
 title: 小學教育
-fetched_at: 2026-09-16T10:39:04.898Z
+fetched_at: 2026-09-17T16:08:36.575Z
 ---
 
 - 概覽及工作重點

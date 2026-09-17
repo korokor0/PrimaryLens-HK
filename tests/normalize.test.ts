@@ -38,6 +38,21 @@ describe('normalize', () => {
     expect(body).toContain('- 參考資料');
     expect(body.startsWith('小班教學')).toBe(false);
 
+    // A list item decorated with badge divs stays one bulleted line. Before this was fixed,
+    // EDB's <div class="new-btn"><div>新</div></div> made the <li> look like scaffolding: it
+    // lost its bullet and emitted 新 and PDF as if they were separate sentences.
+    expect(body).toContain('- 第一部分：教育支援 (PDF) 新');
+    expect(body.split('\n')).not.toContain('新');
+    expect(body.split('\n')).not.toContain('PDF');
+
+    // Inline links inside a sentence must not be split onto their own lines, or the diff would
+    // report 「此處」 as a change in its own right. Only a block that *is* a list of links splits.
+    expect(body).toContain('- 有關簡介會簡報，請點擊此處');
+    expect(body.split('\n')).not.toContain('此處');
+
+    // A line with no word character is punctuation, not content.
+    expect(body.split('\n')).not.toContain('：');
+
     // Zero-width characters are stripped, so an invisible edit cannot change the hash.
     expect(body).toContain('每班學生人數為二十五人。');
     expect(body).not.toMatch(/[​-‍﻿]/);

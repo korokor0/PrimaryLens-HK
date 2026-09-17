@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/direct-subsidy-scheme/useful-materials.html
 title: 實用資料
-fetched_at: 2026-09-16T10:39:22.859Z
+fetched_at: 2026-09-17T16:08:54.458Z
 ---
 
 - 直接資助計劃註釋(小學)

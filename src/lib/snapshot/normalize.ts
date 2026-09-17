@@ -38,6 +38,20 @@ const BLOCK = new Set([
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'section', 'article', 'blockquote', 'header', 'footer',
 ]);
 
+/**
+ * Blocks that carry document *structure*. A `<div>` is not one of them: EDB wraps badges and
+ * PDF buttons in divs *inside* list items —
+ * `<li><span>…</span><div class="new-btn"><div>新</div></div></li>` — and treating those as
+ * structure breaks the list item apart, dropping its bullet and emitting 新 and PDF as if they
+ * were separate sentences. A div only counts as structure when it actually wraps some.
+ */
+const STRUCTURAL = new Set([
+  'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
+  'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'section', 'article', 'blockquote', 'header', 'footer',
+]);
+
 /** A short `<strong>` alone in its block is a section title on this site. */
 const MAX_PSEUDO_HEADING_CHARS = 60;
 
@@ -45,8 +59,27 @@ function isElement(node: AnyNode): node is Element {
   return node.type === 'tag';
 }
 
+/** Does this subtree contain any element that carries document structure? */
+function containsStructural($: cheerio.CheerioAPI, el: Element): boolean {
+  return $(el).find([...STRUCTURAL].join(',')).length > 0;
+}
+
+/**
+ * True when an element is scaffolding to descend through rather than a leaf to render.
+ *
+ * A child only makes its parent scaffolding if it is structural, or is a div that wraps
+ * something structural. That distinction is what keeps a list item whole when EDB decorates it
+ * with badge divs, while still descending into a div that genuinely wraps a table or a list.
+ */
 function hasBlockChild($: cheerio.CheerioAPI, el: Element): boolean {
-  return $(el).children().toArray().some((child) => BLOCK.has(child.tagName));
+  return $(el).children().toArray().some((child) => {
+    // EDB's CMS emits empty <ul class="lbs-1"></ul> inside list items. They are structural by
+    // tag and empty in fact, and treating them as structure splits the item that contains them.
+    if ($(child).text().trim() === '') return false;
+    if (STRUCTURAL.has(child.tagName)) return true;
+    if (child.tagName === 'div' || child.tagName === 'span') return containsStructural($, child);
+    return false;
+  });
 }
 
 /** Collapse an element's inline content to one line, with <br> as a separator. */
@@ -76,6 +109,10 @@ function clean(text: string): string {
     .replace(/[​-‍﻿­]/g, '')
     .replace(/ /g, ' ')
     .replace(/[ \t]+/g, ' ')
+    // Spacing an inlined badge div apart can leave a gap inside brackets — `( PDF )`. Close
+    // those up so the line reads the way the page does.
+    .replace(/([（(【「『])\s+/g, '$1')
+    .replace(/\s+([）)】」』])/g, '$1')
     .trim();
 }
 
@@ -116,7 +153,14 @@ function segmentBlock($: cheerio.CheerioAPI, el: Element): Segment[] {
     return pending === '' || /[。！？；]$/.test(pending);
   };
 
-  const anchorCount = $(el).find('a').length;
+  // Split links onto separate lines only when the block *is* a list of them — judged by the
+  // share of its text that lives inside anchors, which works regardless of block length. A
+  // sentence like 「…簡介會簡報，請點擊此處」 merely contains inline links and must stay one
+  // sentence, or the diff would report 「此處」 as a change in its own right.
+  const anchors = $(el).find('a');
+  const anchorChars = anchors.toArray().reduce((sum, a) => sum + clean($(a).text()).length, 0);
+  const totalChars = clean($(el).text()).length;
+  const isLinkList = anchors.length >= 2 && totalChars > 0 && anchorChars / totalChars >= 0.7;
 
   const walk = (node: AnyNode): void => {
     if (node.type === 'text') {
@@ -140,9 +184,18 @@ function segmentBlock($: cheerio.CheerioAPI, el: Element): Segment[] {
       }
     }
 
+    // A block-level element rendered inline — EDB's badge and button divs — needs a space
+    // around it, or `(PDF)` and `新` run together into one word.
+    if (BLOCK.has(node.tagName)) {
+      buffer.push(' ');
+      for (const child of node.children) walk(child);
+      buffer.push(' ');
+      return;
+    }
+
     // Only break links apart when the block is a list of them; a single inline link
     // belongs in its sentence.
-    if (node.tagName === 'a' && anchorCount >= 2) {
+    if (node.tagName === 'a' && isLinkList) {
       const text = clean($(node).text());
       if (text !== '') {
         flush();
@@ -165,8 +218,11 @@ export function htmlToMarkdown(contentHtml: string): string {
   const $ = cheerio.load(contentHtml, null, false);
   const lines: string[] = [];
 
+  // A line carrying no word character at all — EDB leaves stray 「：」 in its own element — is
+  // punctuation, not content. Emitting it would put a bare colon in a change notification.
+  const HAS_WORD = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}a-zA-Z0-9]/u;
   const emit = (line: string): void => {
-    if (line !== '') lines.push(line);
+    if (line !== '' && HAS_WORD.test(line)) lines.push(line);
   };
 
   const walk = (el: Element): void => {

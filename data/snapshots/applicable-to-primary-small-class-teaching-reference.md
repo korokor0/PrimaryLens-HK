@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary/small-class-teaching/reference.html
 title: 參考資料
-fetched_at: 2026-09-16T10:39:19.849Z
+fetched_at: 2026-09-17T16:08:51.457Z
 ---
 
 ## 甲. 香港小班教學研究報告（只備英文版）
@@ -66,11 +66,4 @@ Wood, D (1998) How Children Think and Learn, Oxford: Blackwells
 蔣莉　劉力 (2003) "新班級教育"的實踐探索, 中國工人出版社
 
 ## 丙. 相關網站
-1.Project STAR (Student Teacher Achievement Ratio)A large-scale, four-year, experimental study of reduced class size conducted by HEROS, Inc. in U.S.
-https://eric.ed.gov/?id=ED419593
-2.U.S. Department of EducationResearch paper on reducing class size
-http://www2.ed.gov/rschstat/eval/other/class-size/index.html
-3.Education World
-http://www.educationworld.com/a_issues/archives/class_size.shtml
-4.The Cooperative Learning Center at The University of Minnesota
-http://www.co-operation.org
+1. Project STAR (Student Teacher Achievement Ratio) A large-scale, four-year, experimental study of reduced class size conducted by HEROS, Inc. in U.S. https://eric.ed.gov/?id=ED419593 2. U.S. Department of Education Research paper on reducing class size http://www2.ed.gov/rschstat/eval/other/class-size/index.html 3. Education World http://www.educationworld.com/a_issues/archives/class_size.shtml 4. The Cooperative Learning Center at The University of Minnesota http://www.co-operation.org

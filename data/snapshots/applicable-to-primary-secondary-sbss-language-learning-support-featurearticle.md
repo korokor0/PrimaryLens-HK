@@ -1,7 +1,7 @@
 ---
 url: https://www.edb.gov.hk/tc/edu-system/primary-secondary/applicable-to-primary-secondary/sbss/language-learning-support/featurearticle.html
 title: 語文學習支援
-fetched_at: 2026-09-16T10:39:12.322Z
+fetched_at: 2026-09-17T16:08:43.897Z
 ---
 
 香港是國際都會，為提高我們的國際競爭力，促進與內地的交流和聯繫，我們需要培養中英兼擅的人才。
