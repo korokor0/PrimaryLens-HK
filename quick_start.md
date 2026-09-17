@@ -31,7 +31,7 @@ Leave everything else as it is. Never commit this file.
 
 ```bash
 pnpm crawl      # ~35 seconds: fetches the 22 watched pages, builds snapshots + search index
-pnpm dev        # http://localhost:3000
+pnpm dev        # http://127.0.0.1:3666
 ```
 
 `pnpm crawl` is a one-off. You do **not** need `pnpm discover` — the watch list is already
@@ -39,7 +39,7 @@ committed.
 
 ## 4. Try it
 
-Open http://localhost:3000.
+Open http://127.0.0.1:3666.
 
 **A question it can answer** — 「小學全日制的背景是甚麼？」
 You get an answer citing the EDB page it came from. The right-hand panel shows the real tool
@@ -83,7 +83,7 @@ pnpm typecheck
 | Problem | Fix |
 |---|---|
 | `corepack: command not found` | Use `npm install -g pnpm@12`; corepack is gone in Node 25+ |
-| `Port 3000 is already in use` | `PORT=3001 pnpm dev` |
+| `Port 3666 is already in use` | `PORT=3667 pnpm dev` |
 | `No retrieval index yet` | Run `pnpm crawl` once |
 | `Chat needs OPENAI_API_KEY and OPENAI_MODEL` | Add both to `.env.local`. Monitoring still works without them |
 | `pnpm check` exits 1 | A page couldn't be fetched; the failing pages are listed above the error |

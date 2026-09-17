@@ -634,7 +634,7 @@ cp .env.example .env.local
 pnpm discover        # tsx scripts/discover.ts → config/pages.json
                      # HUMAN REVIEW pages.json before continuing
 pnpm crawl           # tsx scripts/crawl.ts → cache + committed snapshots + index
-pnpm dev             # tsx watch src/server.ts → http://localhost:3000
+pnpm dev             # tsx watch src/server.ts → http://127.0.0.1:3666 (loopback only; HOST/PORT override)
 pnpm start           # tsx src/server.ts (no watch)
 
 pnpm check           # tsx scripts/check.ts

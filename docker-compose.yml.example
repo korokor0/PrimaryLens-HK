@@ -19,9 +19,13 @@ services:
     container_name: edb-agent
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      # Host loopback only; Caddy (or another reverse proxy) is the public entry point.
+      - "127.0.0.1:3666:3666"
     env_file:
       - .env.local
+    environment:
+      # Overrides any HOST in .env.local: inside the container the app must listen on 0.0.0.0.
+      HOST: 0.0.0.0
     volumes:
       # Persistent writable storage, which CLAUDE.md §11 requires for the monitoring flow:
       # data/snapshots is the baseline, and data/{cache,index,trace} are rebuilt as it runs.
@@ -33,7 +37,7 @@ services:
       # The reviewed allowlist. Read-only: nothing at runtime should ever rewrite it.
       - ./config:/app/config:ro
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3666/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3

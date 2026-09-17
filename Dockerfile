@@ -20,8 +20,11 @@ RUN pnpm install --frozen-lockfile
 # ---- runtime ----------------------------------------------------------------------
 FROM node:22-slim AS runtime
 WORKDIR /app
+# The app binds to 127.0.0.1 by default, which is unreachable through a port mapping, so the
+# container listens on all of its own interfaces. Exposure on the host is decided by compose.
 ENV NODE_ENV=production \
-    PORT=3000
+    HOST=0.0.0.0 \
+    PORT=3666
 
 RUN npm install -g pnpm@12
 
@@ -38,11 +41,11 @@ COPY data ./data
 RUN chown -R node:node /app/data
 USER node
 
-EXPOSE 3000
+EXPOSE 3666
 
 # /api/status needs no API key, which makes it a valid liveness check even when chat is
 # unconfigured — monitoring is designed to work without LLM credentials.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3666)+'/api/status').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["pnpm", "start"]

@@ -38,13 +38,14 @@ pnpm install
 cp .env.example .env.local     # then add your OpenAI key, see §3
 
 pnpm crawl                     # ~35s: fetches the 22 watched pages, builds the baseline + index
-pnpm dev                       # http://localhost:3000
+pnpm dev                       # http://127.0.0.1:3666
 ```
 
 That is the whole setup. `config/pages.json` and `data/snapshots/` are already committed, so
 you do **not** need to run `pnpm discover` unless you want to rebuild the watch list.
 
-If port 3000 is busy: `PORT=3001 pnpm dev`.
+If port 3666 is busy: `PORT=3667 pnpm dev`. The server listens on `127.0.0.1` only; to serve it
+publicly, put a reverse proxy (e.g. Caddy) in front rather than changing `HOST`.
 
 ## 3. Environment variables
 
@@ -129,7 +130,7 @@ pnpm check
 baseline so a second run prints `status=unchanged`. The UI's 「檢查更新」 button does the same
 thing through the same code path.
 
-**Status page.** `http://localhost:3000/status` is a read-only, server-rendered view of the
+**Status page.** `http://127.0.0.1:3666/status` is a read-only, server-rendered view of the
 same state: whether chat and the webhook are configured, when the index was built, the last
 check's result, and each watched page's snapshot age. It triggers nothing.
 
@@ -141,7 +142,7 @@ To watch a webhook fire, point `WEBHOOK_URL` at any endpoint that accepts a POST
 cp docker-compose.yml.example docker-compose.yml
 cp .env.example .env.local                  # add your key
 docker compose run --rm app pnpm crawl      # one-off: build baseline + index
-docker compose up -d                        # http://localhost:3000
+docker compose up -d                        # http://127.0.0.1:3666
 ```
 
 `./data` is bind-mounted, so the snapshots the container compares against are the ones in your
