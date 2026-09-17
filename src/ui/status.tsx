@@ -23,7 +23,13 @@ export interface StatusPageRow {
 export interface StatusView {
   startedAt: Date;
   now: Date;
-  chat: { configured: boolean; model?: string | undefined; baseUrl?: string | undefined; error?: string | undefined };
+  chat: {
+    configured: boolean;
+    model?: string | undefined;
+    queryModel?: string | undefined;
+    baseUrl?: string | undefined;
+    error?: string | undefined;
+  };
   monitor: { webhookConfigured: boolean; fetchDelayMs?: number | undefined; error?: string | undefined };
   index: { builtAt: string; chunkCount: number } | null;
   lastCheck: LastCheck | null;
@@ -98,7 +104,7 @@ function StatusPage({ view }: { view: StatusView }) {
                 <dt>問答（LLM）</dt>
                 <dd>
                   {chat.configured
-                    ? <span class="ok">已設定 · {chat.model} · {chat.baseUrl}</span>
+                    ? <span class="ok">已設定 · 回答：{chat.model} · 搜尋字詞：{chat.queryModel} · {chat.baseUrl}</span>
                     : <span class="warn">未設定 — {chat.error ?? '缺少 OPENAI_API_KEY / OPENAI_MODEL'}</span>}
                 </dd>
                 <dt>Webhook</dt>

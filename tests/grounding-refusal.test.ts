@@ -78,6 +78,17 @@ describe('grounding refusal', () => {
     expect(model.requests[1]?.tools).toBeUndefined();
     expect(model.requests[1]?.toolChoice).toBeUndefined();
     expect(result.trace.outcome).toBe('answered');
+
+    // With a separate query model, call 1 goes to it and call 2 to the answer model — and the
+    // trace names each, so the split is visible rather than hidden.
+    const answerer = spyModel();
+    const querier = spyModel();
+    const split = await runChat({ ...deps(answerer), queryModel: querier }, '小學全日制的背景是甚麼？');
+    expect(querier.requests).toHaveLength(1);
+    expect(querier.requests[0]?.toolChoice).toBe('required');
+    expect(answerer.requests).toHaveLength(1);
+    expect(answerer.requests[0]?.tools).toBeUndefined();
+    expect(split.trace.steps.filter((s) => s.type === 'model_call').map((s) => s.type === 'model_call' && s.stage)).toEqual(['tool_selection', 'final_answer']);
   });
 
   it('strips any URL the model produces that is not in this turn\'s evidence', async () => {

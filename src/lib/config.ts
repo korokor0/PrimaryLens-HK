@@ -15,6 +15,11 @@ export interface Config {
   openaiApiKey: string | undefined;
   openaiBaseUrl: string;
   openaiModel: string | undefined;
+  /**
+   * Optional cheaper model for the first call only — choosing search terms is a trivial task.
+   * The grounded answer always uses `openaiModel`. Unset means both calls use the same model.
+   */
+  openaiQueryModel: string | undefined;
   webhookUrl: string | undefined;
   seedUrl: string;
   fetchDelayMs: number;
@@ -90,6 +95,7 @@ export function parseConfig(env: Record<string, string | undefined>, need: Need)
   return {
     openaiApiKey,
     openaiModel,
+    openaiQueryModel: read(env, 'OPENAI_QUERY_MODEL'),
     openaiBaseUrl: requireUrl(read(env, 'OPENAI_BASE_URL') ?? DEFAULTS.openaiBaseUrl, 'OPENAI_BASE_URL'),
     webhookUrl: webhookUrl ? requireUrl(webhookUrl, 'WEBHOOK_URL') : undefined,
     seedUrl: requireUrl(read(env, 'EDB_SEED_URL') ?? DEFAULTS.seedUrl, 'EDB_SEED_URL'),

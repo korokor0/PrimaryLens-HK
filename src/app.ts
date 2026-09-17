@@ -57,7 +57,12 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
     let chat: StatusView['chat'];
     try {
       const cfg = parseConfig(env, 'chat');
-      chat = { configured: true, model: cfg.openaiModel, baseUrl: cfg.openaiBaseUrl };
+      chat = {
+        configured: true,
+        model: cfg.openaiModel,
+        queryModel: cfg.openaiQueryModel ?? cfg.openaiModel,
+        baseUrl: cfg.openaiBaseUrl,
+      };
     } catch (err) {
       chat = { configured: false, error: err instanceof ConfigError ? err.message : String(err) };
     }
@@ -118,6 +123,16 @@ export function createApp({ store, env, pages }: AppDeps): Hono {
             baseUrl: cfg.openaiBaseUrl,
             model: cfg.openaiModel ?? '',
           }),
+          // Only build a second client when the query model actually differs.
+          ...(cfg.openaiQueryModel !== undefined && cfg.openaiQueryModel !== cfg.openaiModel
+            ? {
+                queryModel: createOpenAIModel({
+                  apiKey: cfg.openaiApiKey ?? '',
+                  baseUrl: cfg.openaiBaseUrl,
+                  model: cfg.openaiQueryModel,
+                }),
+              }
+            : {}),
           index,
           allowedUrls,
           exampleTopics: topics,

@@ -53,7 +53,10 @@ export interface ChatModel {
 }
 
 export interface ChatDeps {
+  /** Writes the grounded answer (call 2). */
   model: ChatModel;
+  /** Optional cheaper model for choosing search terms (call 1). Defaults to `model`. */
+  queryModel?: ChatModel | undefined;
   index: Index;
   /** The committed allowlist. A URL the model emits must appear here *and* in this turn's hits. */
   allowedUrls: Set<string>;
@@ -136,8 +139,11 @@ export async function runChat(deps: ChatDeps, question: string): Promise<ChatRes
     { role: 'user', content: trimmed },
   ];
 
+  // Picking search terms is the easy half of the job, so it may run on a cheaper model. The
+  // answer never does: grounded Traditional Chinese synthesis is where model quality shows.
+  const querier = deps.queryModel ?? model;
   const firstStarted = Date.now();
-  const first = await model.complete({
+  const first = await querier.complete({
     messages: firstMessages,
     tools: [SEARCH_TOOL],
     toolChoice: 'required',
@@ -145,7 +151,7 @@ export async function runChat(deps: ChatDeps, question: string): Promise<ChatRes
   trace.steps.push({
     type: 'model_call',
     stage: 'tool_selection',
-    model: model.name,
+    model: querier.name,
     toolChoice: 'required',
     tools: [SEARCH_TOOL_NAME],
     ms: Date.now() - firstStarted,
